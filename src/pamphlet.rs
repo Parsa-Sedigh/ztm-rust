@@ -253,5 +253,143 @@ that struct or enum as their name.
 You can think of Self just as the struct or enum's name.
 You can use the name of struct or enum that you're using impl for it, instead of the Self. The only issue is that if you decide to later change the name of
 that struct or enum to sth else, then you gonna have to change the impl functions that are using the name of that struct or enum as Self. But if you use the Self,
-you don't need to do that, after changing the name of that struct or enum.*/
+you don't need to do that, after changing the name of that struct or enum.
+
+In cold.show_temp() we didn't pass anything to show_temp() because the self is implied when you use the dot notation.
+
+If you call show_temp() multiple times, it will run correctly, because we're borrowing self(so we take a reference to it in that show_temp() function, hence
+&self), so we can use it multiple times.
+
+So implementing functionality on structures and enumarations, provides easy ways to manage your code, because all the Temparature related stuff are in that
+impl block, in one place.
+
+41-lesson41: Activity | impl
+
+42-lesson42: data structures | vector:
+- A vector is a data structure that allows you to store multiple pieces of data. The data must be of the same type
+- They are used for list of information, for example a grocery list.
+- vectors allow data to be added and removed and you can also travers the entries of a vector to work with the data
+
+Two ways of creating a vector:
+let my_numbers = vec![1, 2, 3];
+OR
+let mut my_numbers = Vec::new();
+my_numbers.push(1);
+my_numbers.push(2);
+my_numbers.push(3);
+
+let two = my_numbers[1]; this is called the slice notation, so when we have those [] around an index number, we're slicing into the vector.
+
+Macros in rust, expand to actual rust code. So the vec! macro expands into sth like approach 2 for creating a vector.
+
+- vectors contain multiple pieces of similar data
+- data can be added or removed from vectors easily
+- the vec! macro can be used to easily make vectors in your code
+- use for ... in to iterate through items of a vector*/
+/* 43-lesson43: Demo | vectors
+
+44-lesson44: Activity | vectors:
+
+45-lesson45: Data types | strings:
+Two commonly used types of strings:
+String: owned
+&str: borrowed String slice
+
+If you want to store a string data in a struct, you must use an owned String. You can't store a slice in the struct(at least not yet).
+When you want to give string data to a function, you wanna use a &str string slice(), because it's more efficient.
+
+By default, when you create a string by saying:
+Learn: let a = "a string"; , it's automatically borrowed, so it's of type &str . So we can pass it to a function easily, by passing that variable without
+ using & on that variable.
+
+If we want to create an owned string, we can do that in multiple different ways:
+let owned_string = "owned string".to_owned();
+let another_owned = String::from("another");
+Now if we want to pass these variables to a function that accepts a string slice, we need to pass them with & . For example:
+print_it(&owned_string);
+print_it(&another_owned);
+But we need to do:
+print_it("a string slice"); // so a literal string is a reference string
+
+If we try to store borrowed data in a struct, it won't compile, because when that struct is to be dropped at the end of the scope,
+the struct is responsible for cleaning up it's own memory, however since we have borrowed memory in that struct, the struct is not allowed
+to clean it up, because it doesn't own that data which is in reference(borrowed) format in there. So it results in compile error.
+So for example you can not store string slice or &str in struct in this manner:
+struct Employee {
+    name: &str,
+}
+
+but this compiles:
+struct Employee {
+    name: String,
+}
+
+- Strings are automatically borrowed
+- Use .to_owned() or String::from() to create an owned copy of a string slice
+- use an owned String when storing in a struct*/
+/* 46-lesson-46: Demo | Strings:
+
+47-lesson-47: Activity | Strings:
+
+48-lesson-48: Demo | Derive
+We're gonna see how functionality can be automatically implemented on your enums and structs by using a derive macro.
+
+49-lesson49: Fundamentals | type annotations:
+Type annotations are required in function signatures.
+
+50-lesson50: Working with data | enum revisited:
+- enum is a type that can represent ONE item at a time.
+- if a variant has some data, it is REQUIRED to has that data when you create the variant.
+
+51-lesson51: Demo | advanced match
+
+52-lesson52: Activity | advanced match
+
+53-lesson53: working with data | Option(how optional data is managed using Option type)
+- The Option type is a type that may be one of two things: it may be some data of a specified type or it maybe nothing.
+- it's used in scenarios where data may not be required or is unavailable at the time like:
+  unable to find sth
+  ran out of items in a list
+  form field not filled out
+
+definition of an Option:
+enum Option<T> {
+    Some(T),
+    None
+}
+
+Important: Normally with enums, we have to use this syntax: <name of enum>::<name of variant>, in order to actually use the variant, however, Options are
+ so commonly used in rust that the variants are exposed for usage directly without typing the word Option each time. That's why we're able to
+ just type in: Some(22) to represent the variants within an Option.
+
+To access data within an option, we can do so with a match expression.
+
+Some() and None are variants available on an Option type.
+
+Learn: By using the `return` keyword, it allows you to EARLY return from a function.*/
+/* 54-lesson54: Demo | Option
+
+55-lesson55: Activity | Option
+
+56-lesson56: Documentation
+
+57-lesson57: Demo | standard library
+`rustup doc` will load the rust library docs.
+
+58-lesson58: Activity | utilizing standard library functionality
+
+59-lesson59: Working with data | result
+How work with functions that may fail under certain circumstances and how the Result data type, maybe used to handle these types of
+situations.
+
+The Result is a data type that contains one of two different types of data. It either contains Succesful data or contains Error data.
+It's used in scenraios where an action needs to be taken but has the possibility of failure, like copying a file perhaps the file was
+previously deleted or connecting to a website.
+A Result can be used in all of these scenarios to detail the error on why you'd be unable to connect to a website.
+
+Similar to the Option type, the Ok(<value>) and Error(<value>) variants, are always available for use without using the :: to get access to them.
+This is useful when you're working with the functionality that can potentially fail.
+
+60-lesson60: Demo | result
+*/
 
