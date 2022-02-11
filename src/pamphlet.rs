@@ -382,8 +382,8 @@ Learn: By using the `return` keyword, it allows you to EARLY return from a funct
 How work with functions that may fail under certain circumstances and how the Result data type, maybe used to handle these types of
 situations.
 
-The Result is a data type that contains one of two different types of data. It either contains Succesful data or contains Error data.
-It's used in scenraios where an action needs to be taken but has the possibility of failure, like copying a file perhaps the file was
+The Result is a data type that contains one of two different types of data. It either contains Successful data or contains Error data.
+It's used in scenarios where an action needs to be taken but has the possibility of failure, like copying a file perhaps the file was
 previously deleted or connecting to a website.
 A Result can be used in all of these scenarios to detail the error on why you'd be unable to connect to a website.
 
@@ -391,5 +391,55 @@ Similar to the Option type, the Ok(<value>) and Error(<value>) variants, are alw
 This is useful when you're working with the functionality that can potentially fail.
 
 60-lesson60: Demo | result
+If you want to return nothing from a function, you can use the unit type and that is just pair of parentheses.
+
+Learn: By using the question operator, it will automatically perform a match operation and what will happen is, if the result is an OK() variant, then the inner data(the
+ data that is returned by Ok() variant), will get returned by calling that function which we used question mark operator on it and if it's the
+ Err() variant, then the error that is returned by calling Err(e), is gonna get automatically returned as the Err variant from the function.
+So when we have:
+EX)
+fn pick_choice(input: &str) -> Result<(), String> {
+    let choice = get_choice(input)?;
+}
+
+If get_choice() returns Ok() variant, it would be stored in choice variable but if it returns Err(e) , that error which we named it `e`, would be
+automatically returned from pick_choice() function as the Err variant.
+
+We can chain multiple function calls using the question mark operator, even though all of them may return Results that could possibly
+fail, so if any one of them fails, then the function will just return automatically and we don't have to use a bunch of match blocks
+in order to check each one.
+
+To return nothing with Ok or Err variant, we can say: OK(()) and Err(())
+
+61-lesson61: Activity | Result
+
+62-lesson62: Activity | Result and the question mark operator
+Open a18b activity file.
+
+When you're using the question mark operator, your function must return a Result.
+
+63-lesson63: data structure | Hashmap
+- a hashmap is a collection that stores data as key-value pairs. Data is located using the key and the data itself is the value.
+- it's similar to definitions in a dictionary. So you know what the key is, but you don't know what the value is at that key
+- hashmaps are very fast to retrieve data when you're using a key.
+
+When creating new hashmaps, you'll need to use mutable values, because we have to manually insert the data within the hashmap.
+
+In hashmaps, data is stored in random order. So if you insert 1 2 3, you may get back 3 2 1, when you iterate through it. This differs
+from vectors where everything comes in the same order as is placed in the vector.
+
+- hashmaps store information as key-value pairs. The key is used to access the value.
+- they're very fast to insert and find data, when you have the key.
+
+64-lesson64: Demo | Hashmap
+
+65-lesson65: Activity | hashmap
+
+66-lesson66: Demo | basic closures
+A closure is an anonymous(don't have name) function that you can create within your code.
+
+Closures must always be defined within another function. It's also possible to give them a name, but it's not required.*/
+/* 67-lesson67: Demo | map combinator:
 */
+
 
