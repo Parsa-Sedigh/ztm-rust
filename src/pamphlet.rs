@@ -440,6 +440,32 @@ A closure is an anonymous(don't have name) function that you can create within y
 
 Closures must always be defined within another function. It's also possible to give them a name, but it's not required.*/
 /* 67-lesson67: Demo | map combinator:
-*/
+Map combinator can be used to transform data.
 
+The great thing about .map() is it will only apply, if there actually is a value there. So if we use map() and the Option<T> happens to be None,
+then the .map() won't run, just like what match block will do.
+
+One thing to know with map(), is eventually you will have to a match operation, because the return value of .map() on Option<T>, will still be an Option<U> .
+
+
+68-lesson68: Activity | map combinator
+We don't need to specify type annotation with closures, because the compiler is able to figure out the type on it's own, in addition, the compiler
+can also figure out the return type of .map() .
+
+69-lesson69: Demo | option combinators
+These combinators allow you to manipulate data and manage options.
+
+Difference of or_else() and unwrap_or_else(), is that or_else() still returns optional data, so it needs to return
+Some() or None and with the returned data, since it's optional data, we'll still need to match on later.
+But when we use unwrap_or_else() , it will take out the data and then place it within the storing variable. So that variable will no
+longer have optional data(hence the word `unwrap`, so this function will unwrap the Some(x) to x itself, or in case of None, it will return the
+specified default value).
+So if we started with some optional data and then call unwrap_or_else() , the original data will be placed in that variable that we want to
+store data. If the thing that we're calling unwrap_or_else() on it, has no data, then the default data that we specify in unwrap_or_else()'s closure
+will be returned.*/
+/* 70-lesson70: Activity | option combinators
+TODO
+
+71-lesson71: Demo | iterator
+*/
 
