@@ -467,5 +467,32 @@ will be returned.*/
 TODO
 
 71-lesson71: Demo | iterator
+In second plus_one , we HAVE TO specify type annotation because .iter and .collect() operate generically on any kind of data structures. Therefore
+we need to tell collect() that we're working with a Vec and we can do so with type annotations(there are other ways to do it, but type annotations
+is one of the simplest ways).
+
+By saying: Vec<_> , the compiler will figure out the type of underscore.
+
+Learn: With filter() , whenever you return true, for a particular element, then we will keep that value and if we return false, it will remove
+ that value.
+
+The reason .last() returns an Option, is because it is possible to create an empty vector.
+
+The key takeaway with iterators is that they do not actually execute anything, it's just a configuration step.
+For example when we have:
+ex)
+ let count = numbers
+        .iter()
+        .take(3)
+        .collect();
+Till .take(3) , we're just configuring. Then as we cal .collect() , now collect() will check that configuration.
+
+72-lesson72: Activity | iterator
+
+73-lesson73: demo | range
+ranges are useful when you need a list of consecutive values, where you can alternatively collect them into a vector and
+then try to create an iterator and then use .filter() .map() and ... the values.
+
+74-lesson74: demo | if let
 */
 
