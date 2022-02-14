@@ -485,7 +485,7 @@ ex)
         .iter()
         .take(3)
         .collect();
-Till .take(3) , we're just configuring. Then as we cal .collect() , now collect() will check that configuration.
+Till .take(3) , we're just configuring. Then as we call .collect() , now collect() will check that configuration.
 
 72-lesson72: Activity | iterator
 
@@ -494,5 +494,26 @@ ranges are useful when you need a list of consecutive values, where you can alte
 then try to create an iterator and then use .filter() .map() and ... the values.
 
 74-lesson74: demo | if let
-*/
+If there was a situation where you only cared if there was some data and 'if there was nothing', we don't care what happens,
+we can use the if let construct.
 
+With enums, if you're ONLY interested in one specific variant of that enum, we can use if let to make it a bit shorter. But if you do want to handle
+the other variant, you can use else statement, but in these situations, it's better to use match statement.
+
+75-lesson75: demo | while let*/
+/* 76-lesson76: demo | modules
+
+77-lesson77: activity | inline modules
+
+78-lesson78: demo | testing
+When you're writing test, it's a good idea to test sth that's on the extreme end(start and end?) of the spectrum. This means
+if your function deals with numbers, you would wanna try the smallest possible number and the biggest possible number and then it's safe
+to assume that everything in between will probably work just fine.
+
+79-lesson79: activity | testing
+activity 22
+
+80-lesson80: demo | external crates
+
+81-lesson81: activity | external crates
+*/
