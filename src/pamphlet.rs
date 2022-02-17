@@ -516,4 +516,73 @@ activity 22
 80-lesson80: demo | external crates
 
 81-lesson81: activity | external crates
+
+82-lesson82: managing code | external creates
+- external modules allows code to be compartmentalized
+
+External modules can either be a directory or a file. When using a directory as a module, it must contain the file `mod.rs` and it can optionally contain
+additional modules.
+
+Look at the pic-1 .
+
+The name in [lib], is the name that we use when accessing the module through code.
+The path is where the module file is located relative to the root of the project.
+In pic-1 you see that the project structure is split into two directories: bin and lib.
+All rust source files in the bin directory will be compiled as individual binary files, having the same name as the source files.
+In that pic, we'll have one binary compiled into a file named app .
+
+mod.rs files are used to indicate that a directory contains modules. The content of mod.rs determines how and if other code can access
+the modules in a directory.
+
+For example the coded directory can not be a module without the mod.rs file.
+
+Omitting pub restricts access to only the containing module and sub-modules.
+
+83-lesson83: activity | external crates
+a26c.rs
+
+The first thing we need to do to create external modules, is to create a library crate. Whenever you have a binary project,
+in order to create a library crate, you need to create some source files and modify your cargo.toml by adding a key named [lib] and then add name and path
+there.
+path in [lib] of cargo.toml means where we're gonna store the code for that external crate.
+activitylib.rs will be our external crate or external module.
+
+The activitylib.rs actually just allows us to make additional modules. So the activitylib.rs is a module itself, it just defines
+a crate which contains modules, although you can put functions directly into that crate itself too.
+
+Now that we created our crate(activitylib.rs) and our two modules, we can go to a26c.rs and start move things around.
+
+84-lesson84: demo | user input
+io has so many possibilities of things going wrong, that there's a special Result provided by the io module that automatically has the
+error type defined for you. So you don't need to include the error type when you're using an io::Result<> , because the error type
+is already provided. So we're only providing the successful data type or the Ok in this case and it's gonna be a String.
+
+A buffer is some space set aside that some other functionality can use and operate with. In our case, we're creating a buffer that is a String buffer.
+
+Buffers have to be mutable, since we're gonna modify the buffer later on.
+
+By saying: io::stdin().read_line(&mut buffer)?; , it means that .read_line() is gonna read a line and then save that
+line into that buffer that is borrowing.
+Important: The ? at the end of that line indicates that that function may possibly fail. If that fails, we will return an error from the function
+ and the data will not have been read from the terminal. However if the data is read properly, then it will be automatically available
+ within buffer variable. Then we return that buffer by using Ok() .
+
+When you're doing a read_line() function, when you press enter, the enter is actually included as part of the data and we don't want to include it, so we use
+.trim() and trim() simply trims any whitespace.*/
+/* 85-lesson85: activity | user input
+
+86- project
+
+87-lesson 87:
+
+88-lesson 88:
+
+89-lesson89:
+
+90-lesson90:
+
+91-lesson91:
+Let's use a HashMap for inner field of Bills struct instead of Vec.
+
+92-lesson92:
 */
