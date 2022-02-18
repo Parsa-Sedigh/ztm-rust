@@ -609,4 +609,19 @@ that function with multiple different data types as long as they all implement t
 We have shared functionality with via a trait.
 
 95-lesson95: activity | traits
+see a25.rs .
+
+impl Perimeter for Square(square is a struct) means implement the Perimeter functionality for Square structure.
+
+96-lesson96: demo | Default trait
+The Default trait is used to create new structures and enumerations with a default value.
+
+Important: The reason you would want to implement Default trait, is because there are other crates along with code within the standard
+ library that will attempt to use default when applicable. In general, it's a good idea to implement Default for any struct or enum where it would
+ make sense to have a default value, because it only makes your code easier to use.
+ If you have defined a new() function for your struct or enum, that does not have any arguments, then you'd want to use Default trait, instead of new() .
+ However in lesson-96.rust , since we can specify the weight argument for new() when we create a new Package, it makes sense to have a new() function
+ and a default() function, where the new() function specifies the weight and the default() just gives you a pre-determined weight.
+
+97-lesson97: Shared functionality | generic functions
 */
