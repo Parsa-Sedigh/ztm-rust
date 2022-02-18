@@ -585,4 +585,28 @@ When you're doing a read_line() function, when you press enter, the enter is act
 Let's use a HashMap for inner field of Bills struct instead of Vec.
 
 92-lesson92:
+Let's implement stage 3.
+
+The question mark operator only works if the containing function also returns an Option. But in our case, since the question mark operator is being used in
+the main function, it doesn't return anything, so we can not use the question mark operator there. To solve this, we're gonna create a new
+function that returns an Option and then just move everything into it, that way we can utilize the question mark operator.
+
+93-lesson93: fundamentals | traits
+- traits are a way to specify that some functionality exists
+- they are used to standardize functionality across multiple different types. Standardization permits functions to operate on multiple different
+  types. The end result is that you end up with code de-duplication.
+
+Normally with functions you would need to write multiple functions if you wanna work with multiple different types and if those types all exhibit some similar
+functionality, then you can use a trait instead. So you would only need to write one function that operates upon a trait and then you can call
+that function with multiple different data types as long as they all implement that trait.
+
+- traits define similar functionality for different types
+- trait functions are just regular functions and they can accept arguments and they can return values
+- in general, you almost always want to have a reference to self in your trait functions
+- you can use `impl Trait` as a function argument to pass data via traits
+
+94-lesson94: demo | traits
+We have shared functionality with via a trait.
+
+95-lesson95: activity | traits
 */
