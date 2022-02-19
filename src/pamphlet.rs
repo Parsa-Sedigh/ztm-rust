@@ -624,4 +624,40 @@ Important: The reason you would want to implement Default trait, is because ther
  and a default() function, where the new() function specifies the weight and the default() just gives you a pre-determined weight.
 
 97-lesson97: Shared functionality | generic functions
+Generic functions allow you to write functions that work with multiple types of data.
+- These functions allow multiple different data types to be used as a function parameter. Instead of providing a data type as you normally would as a
+  function parameter, you provide a trait. The function can then be used with any type of data that has an implementation of that trait.
+  This can be done because traits exhibit behaviors.
+- a generic function can then operate on the behavior defined on that trait instead of an explicit data type.
+
+Rusts type system guarantees that any type of data used as an argument to a generic function, implements the trait required by the function.
+
+So generic functions allow you to write a single function that can be applied to multiple types of data, as long as they implement a trait.
+
+The things within <> , define the generic trait bounds. Those are also called generic constraining, because we're constraining
+the function to only the traits that are specified within those <> .
+
+Syntax 1 for having the parameters to implement a trait:
+fn my_func(param1: impl Trait1, param2: impl Trait2) {}
+
+Syntax 2: Used with one or two generic types that only require one or two traits:
+fn my_func<T: Trait1, U: Trait2>(param1: T, param2: U) {}
+
+Syntax 3: Once you have two or more traits or two or more generic types
+fn my_func<T, U>(param1: T, param2: U)
+where
+    T: Trait1 + Trait2,
+    U: Trait1 + Trait2 + Trait3,
+ {}
+
+Recap:
+fn func(param: impl Trait) {}
+fn func<T: Trait>(param: T) {}
+fn func<T>(param: T) where T: Trait {}
+
+The third syntax is always more clear once you have multiple trait bounds on a single generic type.
+
+A compilation process where generic function expands to multiple function that are defined for each trait that we implement for the structs or enums
+to be used in the generic function, is called Monomorphization.*/
+/* 98-lesson98: demo | generic functions
 */
