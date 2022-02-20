@@ -660,4 +660,17 @@ The third syntax is always more clear once you have multiple trait bounds on a s
 A compilation process where generic function expands to multiple function that are defined for each trait that we implement for the structs or enums
 to be used in the generic function, is called Monomorphization.*/
 /* 98-lesson98: demo | generic functions
+The first thing we need to utilize generics, is a trait that we can implement for multiple different data types.
+
+When we have: fn process_item<T: CheckIn>() {}
+it means T must implement CheckIn trait.
+
+Everytime you create that process_item() function and run it with different pieces of data, you'll increasae the
+size of your binary, however, your code will run extremely fast, because each type of data knows exactly where the function is located in the process memory.
+
+
+99-lesson99: Activity | generic functions
+a29.rs
+
+100-lesson100: shared functionality | generic structures
 */
