@@ -673,4 +673,164 @@ size of your binary, however, your code will run extremely fast, because each ty
 a29.rs
 
 100-lesson100: shared functionality | generic structures
+- generic structures allow you to store any type of data within a structure.
+- trait bounds restrict the type of data the structure can utilize. These trait bounds are also known as generic constraints.
+
+EX)
+If we write:
+trait Seat {
+    fn show(&self);
+}
+
+struct Ticket<T: Seat> {
+    location: T
+}
+fn ticket_info<T: Seat>(ticket: Ticket<T>) {
+    ticket.location.show();
+}
+let airline = Ticket {location: Airline::FirstClass};
+let concert = Ticket {location: Airline::FrontRow};
+
+after expanding will be:
+struct AirlineTicket {
+    location: AirlineSeat
+}
+struct ConcertTicket{
+    location: ConcertSeat
+}
+fn airplane_ticket_info(ticket: AirlineTicket{
+    ticket.location.show();
+}
+fn concert_ticket_info(ticket: ConcertTicket{
+    ticket.location.show();
+}
+
+so we end up with 2 data structures, This process happens automatically by the compiler. However, the implications of this occurring are larger in
+comparison to generic functions.
+If we do place those created tickets in a vector, although they're of type Ticket, we get an error and the error says that we have a mismatched type.
+Learn: This is because the generic structure is actually multiple different non-generic structures and as we know, we can not place
+ two different types into the same vector using this technique.
+ So we can not mix generic structures in a single collection.
+Generic structures expand to structures of specific type and you can not mix different types within one type of collection.*/
+/* 101-lesson101: generic structures | impl blocks
+When we implement functionality on generic structures, we have two options: 1) generic implementations 2) concrete implementations
+- generic implementations allow functionality to be added for any type that can be used with the generic structure
+- concrete implementation allow functionality to be added to the specific type indicated as part of the implementation. Concrete implementations
+  are still restricted by the types that can allow be used with the generic structure.
+
+Important: When we have: impl Game for BoardGame {} you read: BoardGame implements the Game trait.
+
+EX) concrete implementation
+struct PlayRoom<T: Game> {}
+impl PlayRoom<BoardGame> {
+    pub fn cleanup(&self) {}
+}
+this means we're implementing the PlayRoom type, only when it contains a BoardGame
+
+EX) generic implementation
+struct Name<T: Trait1 + Trait2, U: Trait3> {
+    field1: T,
+    field2: U,
+}
+
+impl <T: Trait1 + Trait2, U: Trait3> Name<T, U> {
+     |                             |     |    |
+     -------------------------------     -----
+            generic specification       generic types
+
+    fn func(&self, arg1: T, arg2: U) {}
+}
+This is the syntax for implementing functionality that is generic over any type is similar to the generic specification on the struct itself.
+
+- concrete implementations only apply to the type indicated in the angle braces
+- generic implementations apply to all types that also implement the indicated trait
+two syntax's are available for generic implementation blocks:
+impl <T: Trait1 + trait2, U: Trait3> Name<T, U> {
+    fn func(&self, arg1: T, arg2: U) {} // using T and U here as function parameter types is optional within the implementation block
+}
+or:
+impl<T, U> Name<T, U>
+where
+    T: Trait1 + Trait2
+    U: Trait3
+{
+      fn func(&self, arg1: T, arg2: U) {} // using T and U here as function parameter types is optional within the implementation block
+}
+
+102-lesson102: demo | generic structures
+
+103-lesson103: activity | generic structures
+a30.rs
+If a trait doesn't have any functions defined in it, we're just using that trait as a marker, so it is called a marker trait and it's just to signal to
+the compiler that sth must implement that trait.
+
+104-lesson104: fundamentals | advanced memory
+- all data has a memory address and these addresses determine the location of data in memory
+- offsets can be used to access adjacent addresses and these are also called indexes/indices . So this means we can access
+data before or after the memory address by using an offset.
+
+There are two ways that memory is managed by system:
+1) stack: Stacks have their data placed sequentially, so everything is packed right next to each other. There's a limited amount of
+space available on stack. When writing programs, all variables you create are stored in stack. This does not mean that
+all the data is on the stack, just variables. Stacks are super fast to work with because they use offsets to access data which just requires
+adding or subtracting a number from the memory address.
+
+Knowing the size of the data a head of time is crucial, that way we can utilize offsets. This is why vectors only allow a single type to be contained
+within. Because it uses offsets to jump between data and if everything is the same size, then it can quickly and efficiently jump
+to any element within the vector.
+
+It's only possible to remove items from top of the stack. If we remove some bytes from inside the stack and not top of it,
+then we would have empty space in there and we couldn't reclaim it, because we're not able to move things around, we can just remove from top and add to top.
+So if you want to remove sth from among the stack, you need to remove all the bytes from top of the stack till there and then do your specific task.
+
+2) heap:
+The other way memory is managed is by using a heap. With the heap, data is placed in memory algorithmically. This makes it slower than stack, since the
+address needs to be calculated. However the tradeoff is we get unlimited theoretical space. In reality, this is limited by your hardware.
+The heap uses pointers to point to where the memory is. Pointers are fixed size depending on the architecture of the computer.
+64bit PCs have a pointer size of 64bits for example and the rust data type for pointer is usize.
+Vectors and hashmaps are stored on the heap, along with any dynamically sized collection. This is done because a heap can
+edit memory anywhere random while stack is limited to adding or removing from the top of the stack.
+
+Learn: To access heap data, first the pointer must be read, then get the memory address and then follow that pointer to the actual memory in the heap. This process is
+ called de-referencing.
+Once the pointer is de-referenced, then the data to which it is pointing to, can be accessed.
+
+If a vector(the things that can be stored on heap) runs out of space, the memory can be copied elsewhere and the pointer on the stack can then be updated to
+point to the NEW heap location of that memory.
+Now see the picture: if we wanted to add two more elements to that orange vector, currently, we only have room for one. So what will happen is,
+that entire vector(with F00), will get copied somewhere else that is not yet occupied and then the orange pointer in that stack will be updated
+to point to that new location and then you'll have more memory available to increase the size of your vector.
+
+Note: As you can see the green boxes and then the empty boxes after the third green box is the memory available for that green vector or hashmap, currently and if
+more memory were needed, the entire of those boxes will get copied to other place and the pointer of it will be updated.
+
+To put data on the heap, we use Box::new() which box up the data and then it will be moved on to the heap.
+
+EX)
+struct Entry {
+    id: i32,
+}
+
+fn main() {
+    let data = Entry {id: 5};
+    let data_ptr: Box<Entry> = Box::new(data);
+    let data_stack = *data_ptr; // move the data back to the stack(de-reference the data using *)
+}
+
+When you get an error like: doesn't have a size know at compile time, the reason we get this error is because the size of the object
+may be different when you run the program and it's unable to store it in the stack. Therefore, the fix would be
+to Box the object and store it on the heap. That way the stack will just have a pointer which is always usize
+
+stack:
+- it has sequential memory addresses
+- used for all variables in the program
+- they do have a limited size
+- must know data size(size of data) ahead of time, that way you can properly utilize the offsets
+
+heap:
+- memory addresses are algorithmically calculated
+- used when you're working with large amounts of data
+- it has theoretically unlimited size
+- you can store dynamically sized data or data where you don't know the exact size(dynamically sized data/unknown sized data)*/
+/* 105-lesson105: shared functionality | trait objects
 */
