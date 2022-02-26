@@ -833,4 +833,210 @@ heap:
 - it has theoretically unlimited size
 - you can store dynamically sized data or data where you don't know the exact size(dynamically sized data/unknown sized data)*/
 /* 105-lesson105: shared functionality | trait objects
+Trait objects offer a way to dynamically change program behavior aat runtime.
+- are dynamically allocated objects. You can think of them as generics. These types are calculated when your program runs instead of when you
+  compile your program. Determining these information at runtime is called dynamic dispatch. Contrast this to generics, which determine the type at
+  compile time, using a process called static dispatch.
+
+- one benefit of using trait objects, is mixed type collections. Normally collections require that each item be the same type, but
+  with trait objects, each one can have a different type and exist in the same collection. This makes it easy to work with data that has
+  similar purposes. For example we can place Employees, Managers and Supervisors into a single vector.
+
+- using trait objects in this way enables polymorphic program behavior. Since we can have a vector with multiple different types, we can create a
+  program that behaves differently for each type in the vector.
+
+- trait objects also work well with rapidly evolving program requirements. If we create a new structure, we can turn it into a
+  trait object and just use it with other trait objects. For example, we could add a Contractor as a trait object and bundle it with
+  Employees, Managers and Supervisors and then perform some actions with all of them.
+
+- These benefits has a drawback. Dynamic dispatch has small performance penalty in terms of speed and memory usage.
+
+To create trait objects, we're gonna make heavy use of type annotations.
+
+Creating a trait object:
+
+trait Clicky {
+    fn click(&self);
+}
+
+struct Keyboard;
+
+impl Clicky for Keyboard {
+    fn click(&self) {
+        println!("clicked");
+    }
+}
+
+fn main() {
+    // first way for creating a trait object
+    let keeb = Keyboard;
+    let keeb_obj: &dyn Clicky = &keeb; // here we're creating a trait object
+
+    // second way for creating a trait object(immediately borrow the structure that you created)
+    let keeb: &dyn Clicky = &Keyboard;
+
+    // third way
+    let keeb: Box<dyn Clicky> = Box::new(Keyboard);
+}
+
+Usually we don't use the second approach, we use first or third one. Because in the second way, storing a reference
+into a vector, isn't always useful depending on what you're trying to accomplish.
+
+When we put sth into a Box<> , it let's us move things around.
+So far, we've been borrowing everything by using & and those become problematic when you try to use them in different scenarios.
+However if you put it in a Box, you can move it around wherever you want.
+
+There's another way to create trait objects and that is to not even include any type annoations. Now it may seem not working at first, but we DO have
+type annotations in the function parameters:
+
+Trait object parameter - BORROW:
+fn borrow_clicky(obj: &dyn Clicky) {
+    obj.click();
+}
+
+fn main() {
+    let keeb = Keyboard;
+    borrow_clicky(&keeb);
+}
+So as long as you have tpye annotatiosn somewhere in your program, then rust will automatically convert it into a trait object, when you try to use it.
+So this fourth way is the way you want to use trait objects, that way you don't need to annotate every single one as a trait object. So you just annotate
+the target of the trait object or whatever is using it or the collection, you annotate that with dyn keyword and then anything going into that parameter,
+will become a trait object or in this case, &dyn Clicky.
+
+The same thing applies with Boxes:
+Trait object parameter - MOVE:
+fn move_clicky(obj: Box<dyn Clicky>) {
+    obj.click();
+}
+
+fn main() {
+    let keeb = Box::new(Keyboard);
+    move_clicky(keeb);
+}
+In this example, we don't need any type annotations when declaring the keeb variable, because we have the type annotation in the target function(function that
+receives a trait object).
+
+If you want to move trait objects, you'll put them in Boxes and if you want to borrow trait objects, you can just borrow them directly, you don't need to put
+them into a Box.
+
+How to create a heterogeneous vector:
+Learn: A heterogeneous vector is a vector that contains multiple DIFFERENT types instead of just the one type per vector.
+struct Mouse;
+impl Clicky For Mouse {
+    fn click(&self) {
+        println!("clicked");
+    }
+}
+
+fn make_clicks(clickeys: Vec<Box<dyn Clicky>>) {
+    for clicker in clickeys {
+        clicker.click();
+    }
+}
+
+fn main() {
+    /* first way, annotating each variable: */
+    let keeb: Box<dyn Clicky> = Box::new(Keyboard);
+    let mouse: Box<dyn Clicky> = Box::new(Mouse);
+    let clickers = vec![keeb, mouse];
+
+    /* second way, annotate the vector and then anything that's boxed, will attempt to be turned into a dynamic Clicky trait object:  */
+    let keeb = Box::new(Keyboard);
+    let mouse = Box::new(Mouse);
+    let clickers: Vec<Box<dyn Clicky>> = vec![keeb, mouse];
+
+    make_clicks(clickers);
+}
+This was the common use case for trait objects which is just placing them all into a vector and then iterating through each one and performing some action
+that will be different for each one.
+
+The second approach is easier.
+
+- trait objects allow for composite allocations
+- they are slightly less performant than using generics and that's because they get calculated at runtime instead of at compile time
+- use the dyn keyword when working with trait objects, if you forget the dyn keyword, you'll get a warning, but that's gonna become
+a hard error in a future version of rust
+- trait objects can be borrowed using a reference or they can be moved using a Box. Usually you want to use a Box when you store objects in a vector,
+otherwise , you'll start running into multiple errors and it usually just makes more sense to store Boxes in a vector that way the vector can OWN all the data.
 */
+/* 106-lesson106: demo | trait objects:
+Trait objects allow you to store multiple different types of data in a single collection.
+
+Learn: In &Vec<Box<dyn Sale>> , we have to put the Sale trait into a Box, because when we're working with a Sale, it's a trait, it's not an actual type,
+ traits don't have sizes so they can't properly be calculated in order to layout in memory correctly. However, when we place it within a Box<> ,
+ we know that a Box is a usize, because it's a pointer, so we're able to store any amount of pointers within the vector, because they're all the same
+ size.
+
+Using trait objects in this way, allow us to combine multiple different structures into a single vector and then perform an action on all of the
+different structures to get the result that we wanted.
+
+107-lesson107: activity | trait objects:
+a31.rs
+
+If you use curly brackets instead of semi-colon, you're providing a default implementation of the function of a trait.
+When we have a semi-colon at the end of function in a trait, that means that the implementor MUST implement that function, but if we
+provide {} , we can implement a default function that all of the implementors can use, but they CAN override that default implementation if they want.
+
+Learn: Traits can only access data through functions that are implemented on a structure. Traits are unable to access any fields in a structure,
+ because each structure might have a different field. So we have to rely completely on functions to get any values.
+
+Important: When we have: &Vec<Box<dyn Material>> , it means we can put different types of structures within that vector, because we're
+ boxing that data and a box always has the usize type, and usize is always the same, so it's no problem to put it into a vector.
+ Remember we have to have the dyn keyword so that rust knows that we're working with dynamic dispatch.
+
+In our case, the vector or the materials variable, needs to be annotated in order to use dynamic dispatch.
+
+108-lesson108: ownership | lifetimes
+Lifetimes are a way to specify to the compiler, how to handle borrowed data and this will enable you to store borrowed data in structures and return borrowed
+data from functions.
+
+Ownership review:
+- data in rust programs must have an owner and owner is responsible for cleaning up data. This is how rust handles memory management.
+- by default, data can only have one owner. It is possible to have multiple owners.
+- functions, closures, structs, enums and scopes are owners of data. So whenever you store data in a structure or send data to a function or closure,
+those become the owner of that data
+- data can be moved from one owner to another, through assigning variables and through calling functions and now it's up to them to cleanup that moved data.
+- it is also possible to borrow data from an owner although the owner still needs to clean up the data. Borrowing is done using the & symbol and the
+code borrowing the data is never allowed to cleanup that data.
+
+lifetime:
+Lifetimes are a way to inform the compiler that borrowed data will be valid at a specific point in time.
+Lifetimes are needed for:
+- storing borrowed data in structs or enums
+- returning borrowed data from functions
+
+- all data has a lifetime, but the compiler is able to automatically calculate the lifetimes in many cases.
+- 'static data stays in memory until the program terminates
+
+Learn:
+ struct RobotArm<'a> {
+    part: &'a Part,
+ }
+ in this example, the `a is telling rust that Part exists BEFORE the existance of RobotArm, therefore we're able to access it.
+
+Lifetime annotations indicate that there exists some owned data that:
+- "lives at least as long" as the borrowed data. So let's say you create a struct and you want to borrow from it, you'll have to ensure that the
+structure lives at least as long as that borrow, in order to use it. Because if we delete the struct, then you can't borrow from it because
+it's been deleted.
+- "outlives or outlasts" scope of a borrow. So if you create some data and you create a new scope, then within that scope you can borrow as much as you want.
+Once that scope ends, your borrow is destroyed, but the data you create before the scope, still lying around. So that's totally ok to do.
+- "exists linger that the scope of a borrow. For example you create a configuration struct in the beginning of your program and then later in your
+program, borrow from it without issue or store borrowed data from it, no problem. Because that config struct exists longer than scope.
+
+structures utilizing borrowed data must:
+always be created after the owner was created and they must always be destroyed BEFORE the owner is destroyed. Because you're unable to borrow from sth, if
+it's been destroyed.
+
+Lifetimes allow:
+Borrow the data in a structure and they allow return references from functions
+
+Lifetimes are the mechanism that tracks how long a piece of data resides in memory.
+Lifetimes are usually elided, but they can be specified manually when needed
+Lifetimes are checked by the compiler*/
+/* 109-lesson109: demo | lifetimes
+Whenever you have lifetime annotation on a struct, you'll also need to include them on the impl blocks of that struct and to do that,
+they have to exist directly after the impl keyword and after the name of Struct that you're implementing it.
+
+110-lesson110: activity | lifetimes & structures
+*/
+
