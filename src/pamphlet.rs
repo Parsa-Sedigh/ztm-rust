@@ -1038,5 +1038,126 @@ Whenever you have lifetime annotation on a struct, you'll also need to include t
 they have to exist directly after the impl keyword and after the name of Struct that you're implementing it.
 
 110-lesson110: activity | lifetimes & structures
-*/
+a32.rs
+Learn: 'static indicates that the data lives as long as the program is running. So we could access that at any point in the program.
+
+So whenever you have lifetime annotations, the data has to exist BEFORE the struct or ... .
+
+111-lesson111: activity | lifetimes & functions
+a33.rs
+
+What happens when we return a borrowed value from a function, is rust needs to know where it came from(if we had more than one parameters for function).
+
+112-lesson112: fundamentals | custom errors
+Why you would want to use custom errors:
+- functions may fail in more than one way
+- useful to communicate the failure reason
+- when you're creating custom errors, you'll generally want to use error enumeration, because enums make it easy to add new errors and they can be easily
+  matched upon later.
+
+Having a proper error type has a few requirements:
+- you need to implement the Debug traits which can be derived(in other words, we can use the derive macro, so this one is super easy!). The Debug
+trait is for displaying "what happened" in the context of development and debugging.
+- implement the Display trait. The Display trait is considered a user facing trait. So the message should reflect this.
+- implement the Error trait itself, so we can get interuptebility with other errors. Implementing the Error trait can actually be done with an empty
+  implementation block, because the trait has default implementations.
+  So writing impl details is actually optional, because the trait has a default implementation for everything needed.
+
+Manual error creation:
+#[derive(Debug)]
+enum LockError {
+    MechanicalError(i32),
+    NetworkError,
+    NotAuthorized,
+}
+
+use std::error::Error;
+impl Error for LockError {} // with empty curly brackets, it means we want the default that is already part of the trait
+
+now implement the Display trait:
+use std::fmt;
+
+impl fmt::Display for LockError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            LockError::MechanicalError(ref code) => write!(f, "mechanical error: {}", code),
+            LockError::NetworkError => write!(f, "network error"),
+            LockError::NotAuthorized => write!(f, "not authorized"),
+        }
+    }
+}
+
+Do these automatically with thiserror crate:
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+enum LockError {
+    #[error("mechanical error: {0}")]
+    MechanicalError(i32),
+    #[error("network error")]
+    NetworkError,
+    #[error("not authorized")]
+    NotAuthorized,
+}
+
+How to use this in a program:
+fn lock_door() -> Result<(), LocKError> {
+    // ... some code ...
+    Err(LockError::NetworkError)
+}
+
+Error conversion:
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+enum NetworkError {
+    #[error("Connection timed out")]
+    Timeout,
+    #[error("Unreachable")]
+    Unreachable
+}
+
+enum LockError {
+    #[error("mechanical error: {0}")]
+    MechanicalError(i32, i32),
+    #[error("Network Error")]
+    Network(#[from] NetworkError),
+    #[error("Not Authorized")]
+    NotAuthorized,
+}
+
+Pro tips: Do's:
+- prefer to use error enums over strings.
+  Enums, concisely communicates what went wrong with the function and they are checked by the compiler, so you can't mess up.
+  In addition, the variants can be matched on.
+  strings are OK when prototyping or you don't know exactly what kind of error you should generate, or if the problem domain
+  isn't fully understood, strings are fine to use.
+
+- keep errors specific. Basically error enums should either be module specific or function specific. When working with modules,
+  all the functions within, should be related and should theoratically mostly have the same type of errors. Make an error that
+  covers things that go wrong within that one module, would make sense, since all the functions should have same semantics.
+
+some functions may have many error conditions, or an error that is just out of place when compared to the rest of the surrounding code. It's better to
+make dedicated errors for individual functions, instead of trying to make it fit in some module level error.
+
+- try to use match as much as possible.
+
+More pro tips: Don'ts:
+- never put unrelated errors into a single enum.
+  + If you do this, as the problem domain expands, eventually the enum will become unwieldy, because it
+    would have every error in it and matching would become problematic.
+  + Since enum variants get checked across the entire codebase, if you put all the errors into a single enum, you'll have to update code that never
+    handles a specific error, just because it happens to utilize the enum. This makes updating errors difficult.
+  + also lots of error variants in a single enum, make it impossible to know how a function can fail. This means you'll either
+  spend a lot of time reading the functions you don't need to, or matching on errors that will never happen.
+
+- custom error enums communicate exactly what went wrong in a function
+- errors require three trait implementations:
+  + Debug trait (can easily be derived)
+  + std::error::Error (empty impl block)
+  + Display (manual or crate)
+- use the thiserror crate to easily implement all required traits
+- keep error enums module or function specific.
+  + don't put too many variants in one error*/
+/* 113-lesson113: Demo | custom errors */
 
