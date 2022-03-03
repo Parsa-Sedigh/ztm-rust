@@ -1159,5 +1159,12 @@ More pro tips: Don'ts:
 - use the thiserror crate to easily implement all required traits
 - keep error enums module or function specific.
   + don't put too many variants in one error*/
-/* 113-lesson113: Demo | custom errors */
+/* 113-lesson113: Demo | custom errors
+
+114-lesson114: activity | custom error types
+a27.rs
+In this activity, we have multiple different error types, associated with each function.
+
+115-lesson115: Demo | const
+*/
 
