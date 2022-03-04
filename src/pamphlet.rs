@@ -247,7 +247,7 @@ We can take a reference to self:
 Learn: & is used for borrowing and it also is referred to as a reference. So &self means referencing self and self means whatever the struct or enum that
  you're using with impl.
 
-The difference between Self and self is self indicatets that we ALREADY have that struct or enum, created somewhere in the program.
+The difference between Self and self is self indicates that we ALREADY have that struct or enum, created somewhere in the program.
 The Self indicates that we don't have that struct that we're using impl for it, somewhere and we're creating a new one or we're just referring to
 that struct or enum as their name.
 You can think of Self just as the struct or enum's name.
@@ -1159,12 +1159,117 @@ More pro tips: Don'ts:
 - use the thiserror crate to easily implement all required traits
 - keep error enums module or function specific.
   + don't put too many variants in one error*/
-/* 113-lesson113: Demo | custom errors
+ /* 113-lesson113: Demo | custom errors
 
 114-lesson114: activity | custom error types
 a27.rs
 In this activity, we have multiple different error types, associated with each function.
 
 115-lesson115: Demo | const
+
+116-lesson116: Demo | new types pattern
+The new types pattern leverages the rust type system in order to make your programs more reliable and easier to manage.
+
+This type of structure: struct NeverZero(i32); is called a tuple structure, because instead of using curly braces and having named values,
+it uses parentheses similar to tuples.
+
+It is technically possible to create a NeverZero with ANY value(including zero) by not using the new function, however that's ONLY possible within the
+single module. If you were to place that NeverZero struct in a SEPARATE module, then you would not be able to create it without any functionality and then
+you would want to make the new function public and so the only way to create a NeverZero would be to use the new pub function.
+In this demo we only have a single file so we CAN technically create the NeverZero struct without using the new function and therefore can create a zero
+value with it, but in your programs, you should utilize different modules in order to take advantage of this feature as well as have better code organization.
+
+By utilizing the new type pattern, makes the divide function more performant, because we don't need to check for zero value within that function itself, since
+it checked elsewhere.
+Also the divide function is easier to use, since it just returns a value, it doesn't return a Result.
+
+117-lesson117: activity | new types
+The new types allow you to leverage the rust type system in order to make your code robust.
+a28.rs
+
+118-lesson118: improving reliability | typestate pattern
+Typestates allow you to enforce logic at compile time.
+- typestates leverage the type system to encode state changes
+- they're implemented by creating a type for each state
+  + the types use move semantics to invalidate a state
+  + they usually return next state from previous state
+  + optionally they can also drop the state. Dropping the state is useful for sth like closing files or signaling that a resource is no longer available.
+- typestates give you compile time enforcement of logic. This means it is a compiler error if you attempt to utilize logic in the wrong order
+
+ex)
+struct BusTicket;
+struct BoardedBusTicket;
+
+impl BusTicket {
+    /* We've almost exclusively used a reference to self in most of these cases, however, now we're just doing self with no borrow. This means once the board function is called,
+     the BusTicket will be destroyed.*/
+   fn board(self) -> BoardedBusTicket {
+       BoardedBusTicket
+   }
+}
+fn main() {
+    let ticket = BusTicket;
+    let boarded = ticket.board();
+
+    // compile error
+    ticket.board();
+}
+
+ex)
+struct File<'a>(&'a str);
+
+impl<'a> File<'a> {
+    fn read_bytes(&self) -> Vec<u8> {
+        // read data ...
+    }
+
+
+    /* Important: By calling delete() , because it uses a self and not a reference to self, that File struct will no longer be available to use in the program.\
+        So here, since the file MOVEd to delete, now delete owns it*/
+
+    fn delete(self) {
+        // delete file ...
+    }
+}
+
+fn main() {
+    let file = File("data.txt");
+    let data = file.read_bytes();
+    file.delete();
+
+    // here, even though the file variable is actually available, the data is gone and the compiler will enforce that this happened.
+    // compile error:
+    let read_again = file.read_bytes();
+}
+
+recap:
+- typestates leverage the compiler to enforce logic
+- they can be used for:
+  + invalidating or consuming states
+  + properly transitioning to another state
+  + disallowing access to a missing resource*/
+/* 119-lesson119: demo | typestate pattern
+In this program, the Employee will go through multiple different states to be successfully Onboarded to a new job.
+
+Since we're using typestate transitions by using different structs as types, rust will check
+
+Learn: Blanked implementations are when we have the generic types in all three positions:
+ struct x<T> {}
+ impl<T> x<T> {}
+
+120-lesson120: activity | typestate pattern
+a34.rs
+We're gonna use typestates to do the tracking.
+
+We're gonna do this implementation without using generics, since in this case, it will be cleaner and simpler.
+
+Create the structs needed for the states and the luggage.
+
+For second approach of this activity(generics solution), look at the solution file.
+
+121-lesson121: demo | match guards & binding
 */
+
+
+
 
