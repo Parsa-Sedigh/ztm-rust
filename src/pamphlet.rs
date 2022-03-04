@@ -1268,7 +1268,9 @@ Create the structs needed for the states and the luggage.
 For second approach of this activity(generics solution), look at the solution file.
 
 121-lesson121: demo | match guards & binding
-*/
+When working with match expressions, it's possible to filter out specific types of data in the match expression itself, without having to branch off in more
+code.
+122-lesson122: activity | match guards & binding*/
 
 
 
