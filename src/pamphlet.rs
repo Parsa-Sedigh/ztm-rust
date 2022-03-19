@@ -1442,6 +1442,12 @@ The question mark operator will automatically use a From implementation to conve
 - allow for fallible type conversions
 - if a type can be converted, but there are cases where it can not be done correctly, then you want to implement the TryFrom trait instead of From trait.
 
-129-lesson129: Demo | From/Into*/
+129-lesson129: Demo | From/Into
+
+130-lesson130: activity | TryFrom/TryInto
+TODO
+
+131-lesson131: numeric primitives | limits and type conversion
+*/
 
 
