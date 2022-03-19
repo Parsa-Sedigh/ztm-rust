@@ -1270,8 +1270,178 @@ For second approach of this activity(generics solution), look at the solution fi
 121-lesson121: demo | match guards & binding
 When working with match expressions, it's possible to filter out specific types of data in the match expression itself, without having to branch off in more
 code.
-122-lesson122: activity | match guards & binding*/
+122-lesson122: activity | match guards & binding
+a35.rs
 
+By saying: use Tile::* , we don't need to type `Tile` before each tile, because we're know we're only gonna work with
+tiles in there, so we can just import all of them directly.
 
+123-lesson123: Slices | arrays & slices
+Arrays are fixed size memory regions and slices are pointers into arrays.
+Arrays:
+- arrays represent a contagious memory region
+- all elements of an array must be the same size which means they all need to be the same type
+- arrays are not dynamically sized and they're size is hard coded in your program. In most cases, you will probably want to use
+  a vector instead of an array. However arrays are useful when working with networking protocols, crypto algorithms and matrices.
+  + size must be hard coded
+  + usually prefer Vector
+- useful when writing algorithms with a fixed buffer size.
+  + networking, crypto, matrices
+
+Slices:
+- a slice is a borrowed view into an array
+- slices can be iterated upon
+- they're also optionally mutable
+- indices are bounded by the slice size, which means we cannot go out of the bounds of the initial slice
+- slices can create any number of subspaces from an existing slice
+
+Slices & vectors:
+Since you'll mostly be working with vectors in rust code, it's possible to obtain a slice easily from a vector. So if you borrow a vector and you
+send it as an argument ot a function that requires a slice, then the function will automatically obtain a slice of that vector for you and when
+you write functions that do require slices, you always want to borrow the slice instead of borrowing a vector. So:
+Important: Always prefer to borrow a slice instead of a vector.
+ex)
+fn func(slice: &[u8]) {}
+fn main() {
+    let numbers = vec![1, 2, 3];
+    func(&numbers); // we borrowed the vector and this will be automatically be turned into a slice for us by the function.
+
+    //approach 2 of sending a slice of vector to the function.
+    let numbers: &[u8] = numbers.as_slice();
+}
+
+The reason you wanna write your function signatures to accept the slice instead of borrowing a vector, is that slices allow the function to accept more
+types of collections. Since a slice can usually be obtained from any data structure that's backed by an array. Vectors are backed by arrays,
+so the function works fine with vectors.
+
+With recursive functions, you want to carry the entire slice with you on each function call. So you would have an extra parameter which will represent
+the entire slice and then you can work on that, if you need to backtrack.
+
+Recap:
+- arrays must be statically initialize with hard-coded lengths
+- slices are a way to parts of an array
+- array-backed data structures like vectors can be sliced
+- slice lengths are always bound by the size of the slice
+- subslices can be created from an existing slices*/
+/* 124-lesson124: slices | slice patterns
+Use case:
+- read the first few bytes to determine header information, for example for a file. Then you can take different actions based on that information using a
+  match expression.
+- another use case would be to get the first or last elements of a slice and since we're working with match expressions, there's no need to do any
+bounce checking. The compiler will always ensure that we access data that's within bounds of the slice.
+
+When working with slice patterns, the patterns can easily overlap. So you want to minimize the number of match arms in order to avoid bugs.
+
+ex)
+match slice {
+    [first, ..] => (), // one or more elements will match here
+    [.., last] => (), // this arm always ignored
+    [] => ()
+}
+in this example, the first arm will match if there's only one element and then the second one will never be matched. Also if there's two
+elements, the first one will still be matched, because it'll take the first element and then the second element and we won't reach the second arm.
+
+Preventing overlapping patterns:
+One way to prevent these logic bugs, is to match the largest patterns first and the smallest patterns last.
+In examples below, the first one has a logic error:
+ex 1)
+match slice {
+    [] => (),
+    will match one element, followed by zero or more elements, so this will match any number of elements after an empty slice, so the
+    remaining match arms can never be matched:
+    [a, ..] => (),
+    [a, b, ..] => (),
+    [a, b, c, ..] => (),
+    [a, b, c, d, ..] => (),
+}
+
+ex 2)
+match slice {
+   [a, b, c, d, ..] => (),
+   [a, b, c, ..] => (),
+   [a, b, ..] => (),
+   [a, ..] => (),
+   [] => (),
+}
+
+ex)
+let nums = vec![7, 8, 9];
+match numbs.as_slice() {
+     // take the first element only if the first element is between the range of 1 and 3
+     // `first @ 1..=3` , means bind 1 till 3 to first
+     // rest @ .. means bind rest of the slice to rest variable
+    [first @ 1..=3, rest @ ..] => {
+        // `first` is always 1, 2 or 3
+        //
+    },
+    [single] => if single == &5 || single == &6 => (),
+    [a, b] => (),
+    [] => ()
+}
+
+Recap:
+- slices can be matched on specific patterns. These patterns can include match guards and match bindings.
+- you want to match on largest patterns first, followed by smaller patterns, because otherwise you can end up with bugs
+- minimize the number of match arms in order to prevent overlapping patterns, to avoid bugs
+
+125-lesson125: activity | slices
+a36.rs
+
+126-lesson126: fundamentals | type aliases
+Type aliases allow you to rename existing types.
+- type aliases allow you to give a new name to an existing type. Type aliases are just basic text substition that must follow the
+  syntax of a type signature.
+- simplifies complicated type signatures
+- when using them, the underlying types are checked by the compiler, but unlike new types, the alias is still the same as the original type. This means
+  you can create multiple aliases on a single type and utilize them in your program, but the compiler will only see the underlying type.
+- use new types for stricter type checking*/
+/* 127-lesson127: Type conversion | from/into
+- rust provides a trait that can be used to convert between different types. These traits are called From and Into.
+  From trait starts with the type that you want and will convert another type to it. The Into trait starts with the type that you don't want
+  and coverts it into the type that you do want.
+
+The From trait is an associated method on a type. This means it is a free function that can be accesses using the type name as shown:
+TypeName::from()
+When implementing the From trait, you will get Into implemented for free. So you almost always just implement the From trait.
+The Into trait uses a self method on type to perform the conversion. So we use it like: variable.into() .
+When using the into() , we have to specify the type annotation ourselves.
+
+EX) impl From<u8> for Status {} means we're converting from a u8 into a Status. So the from function that we need to implement, gonna get an argument that
+is the type u8 and will return the type that we're implementing for, which in this case is Status and for convenience, we use Self for return type instead.
+So:
+enum Status {
+
+}
+
+impl From<u8> for Status {
+    fn from(code: u8) -> Self {
+        match code {
+            0 => Status::Working,
+            c => Status::Broken(code)
+        }
+    }
+}
+
+let status: Status = legacy_interface().into();
+The above example will make the return type of legacy_interface() into whatever type we specified for the variable, which in this case that type
+is Status, so into() will make the return type of legacy_interface into Status.
+Alternatively, you can write:
+let status = Status::from(legacy_interface());
+
+Pro tips:
+- From/Into traits can not fail
+- you will almost always want to implement From for error types. That way they can be easily converted between different errors.
+- prefer to implement From instead of Into. This is because implementing From gets you an Into implementation for free.
+- use .into() when it's obvious what the resulting type will be from reading the code.
+- you should use Type::from() when it's crucial to emphasize that a type conversion is happening and to show what the resulting type will be. Using .into()
+  many times will be difficult to read. But using from() will be easy, because the Type is shown as part of the conversion.
+
+The question mark operator will automatically use a From implementation to convert errors.
+
+128-lesson128: Type conversion | TryFrom/TryInto
+- allow for fallible type conversions
+- if a type can be converted, but there are cases where it can not be done correctly, then you want to implement the TryFrom trait instead of From trait.
+
+129-lesson129: Demo | From/Into*/
 
 
